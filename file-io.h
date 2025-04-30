@@ -6,9 +6,11 @@
 
 #include "exception.h"
 
+#define FFS_FIO_HANDLE_NULLFH
+
 #ifdef FFS_FIO_HANDLE_NULLFH
     #define FFS_FIO_NULLFH_HANDLER() \
-        if(!fileHandler) { return EC_NoActiveFile; }
+        if(!fileHandler) { throw Exception(EC_NoActiveFile); }
 #else 
     #define FFS_FIO_NULLFH_HANDLER()
 #endif
