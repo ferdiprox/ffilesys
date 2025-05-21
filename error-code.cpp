@@ -9,21 +9,25 @@ namespace ffilesys
         "Reached end of file",
         "Bad file opening flags",
         "No such file or directory",
+        "Invalid file name"
     };
 
     ErrorCodes errnoToErrorCode()
     {
         switch(errno)
         {
-        default:
+            default:
 #ifdef FFS_DEBUG
-            printf("An unknown error handled: %i\n", errno);
+                printf("ffilesys: An unknown error handled: %i\n", errno);
 #endif
-            return EC_UnknownError;
-        case ENOENT:
-            return EC_NoSuchFileOrDir;
-        case EBADF:
-            return EC_WrongFileFlags;
+                return EC_UnknownError;
+            case EINVAL:
+                // need to check if this code can be raised by another ffilesys errors
+                return EC_InvalidFileName;
+            case ENOENT:
+                return EC_NoSuchFileOrDir;
+            case EBADF:
+                return EC_WrongFileFlags;
         }
     }
 }

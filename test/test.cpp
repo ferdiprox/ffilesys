@@ -13,7 +13,7 @@ void testFullTextWriting()
     }
     catch(ffilesys::Exception const& exception)
     {
-        ffilesys::verboseCode(exception.code);
+        ffilesys::verboseCode(exception.code());
         return;
     }
 
@@ -30,7 +30,7 @@ void testFullTextReading()
     } 
     catch(ffilesys::Exception const& exception)
     {
-        ffilesys::verboseCode(exception.code);
+        ffilesys::verboseCode(exception.code());
         return;
     }
 
@@ -55,7 +55,7 @@ void testStreamBinWriting()
     }
     catch(ffilesys::Exception const& exception)
     {
-        ffilesys::verboseCode(exception.code);
+        ffilesys::verboseCode(exception.code());
         return;
     }    
 }
@@ -78,8 +78,18 @@ void testStreamBinReading()
     }
     catch(ffilesys::Exception const& exception)
     {
-        ffilesys::verboseCode(exception.code);
+        ffilesys::verboseCode(exception.code());
         return;
+    }
+}
+
+void testFileExceptions() {
+    try {
+        ffilesys::File file;
+        file.open("/void/a");
+    }
+    catch (const ffilesys::Exception & exception) {
+        std::cout << "Error: " << exception.what() << '\n';
     }
 }
 
@@ -90,6 +100,8 @@ int main()
 
     testStreamBinWriting();
     testStreamBinReading();
+
+    testFileExceptions();
 
     return 0;
 }

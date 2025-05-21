@@ -1,7 +1,7 @@
 #pragma once
 
-#include <errno.h>
-#include <stdio.h>
+#include <cerrno>
+#include <cstdio>
 #include <exception>
 
 namespace ffilesys
@@ -16,6 +16,7 @@ namespace ffilesys
         EC_EOF,
         EC_WrongFileFlags,
         EC_NoSuchFileOrDir,
+        EC_InvalidFileName,
 
         EC__MAX,
     };

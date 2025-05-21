@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+
 #include "error-code.h"
 
 namespace ffilesys
@@ -7,17 +9,30 @@ namespace ffilesys
     class Exception : public std::exception 
     {
     public:
-        Exception(errcode_t errcode)
+        explicit Exception(const errcode_t errcode)
         {
-            code = errcode;
+            info.assign(reinterpret_cast<const char *>(&errcode), sizeof(errcode_t));
+            info += ERRCODE_DESCR_TABLE[errcode];
+        }
+        Exception(const errcode_t errcode, const std::string& details) {
+            info.assign(reinterpret_cast<const char *>(&errcode), sizeof(errcode_t));
+            info += std::string(ERRCODE_DESCR_TABLE[errcode]) + ": " + details;
+        }
+        Exception(const errcode_t errcode, std::string&& details) {
+            info.assign(reinterpret_cast<const char *>(&errcode), sizeof(errcode_t));
+            info += std::string(ERRCODE_DESCR_TABLE[errcode]) + ": " + std::move(details);
         }
         
-        const char* what() const noexcept override
+        [[nodiscard]] const char* what() const noexcept override
         {
-            return ERRCODE_DESCR_TABLE[code];
+            return info.c_str() + sizeof(errcode_t);
+        }
+        [[nodiscard]] errcode_t code() const noexcept {
+            return *(reinterpret_cast<const errcode_t*>(info.data()));
         }
 
-        errcode_t code;
+        // First bytes of info is raw errcode_t, after them goes description of error.
+        std::string info;
     private:
     };   
 }

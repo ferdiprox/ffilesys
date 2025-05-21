@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <filesystem>
 
@@ -27,13 +27,13 @@ namespace ffilesys
 
     static constexpr int NUM_FILE_OPEN_FLAGS = 4;
 
-    // A Input/Output file manager, based on stdio.h FILE.
-    // Mostly doesnt supports multithreading(but need to test).
+    // An Input/Output file manager, based on cstdio FILE.
+    // Mostly doesn't support multithreading(but need to test).
     class File
     {
     public:
                 
-        // Openning a new file. 
+        // Opening a new file.
         // You can specify flags in ffilesys::FileOpenFlags, for example
         // .open(ffilesys::FOF_Read | ffilesys::FOF_Binary)
         // will open a binary input stream.
@@ -41,10 +41,7 @@ namespace ffilesys
 
         // Closing a file. 
         // Does nothing if the file is not open.
-        inline void close()
-        {
-            fclose(fileHandler);
-        }
+        void close() const;
 
         // Reading a some binary units from the file data.
         // Note that 'outputBuffer' must be pre-allocated with size of 'requiredUnitsNum'.
@@ -53,19 +50,20 @@ namespace ffilesys
         {
             FFS_FIO_NULLFH_HANDLER();
 
-            const size_t readedSize = fread(outputBuffer, sizeof(unit_type), requiredUnitsNum, fileHandler);
-            if(readedSize != requiredUnitsNum)
+            const size_t readSize = fread(outputBuffer, sizeof(unit_type), requiredUnitsNum, fileHandler);
+            if(readSize != requiredUnitsNum)
             {
 #ifdef FFS_DEBUG
-                printf("ffilesys: Wrong readedSize value: (rs)%lu vs (run)%lu\n", readedSize, requiredUnitsNum);
+                printf("ffilesys: Wrong readSize value: (rs)%lu vs (run)%lu\n", readSize, requiredUnitsNum);
 #endif
+
                 throw Exception(errnoToErrorCode());
             }
         }
 
         // Reading a one binary unit of data from the file.
         template<typename unit_type>
-        inline void readOne(unit_type& unit)
+        void readOne(unit_type& unit)
         {
             unit_type* readPointer = &unit;
 
@@ -87,26 +85,26 @@ namespace ffilesys
 
         // Writing a one binary unit into the file data.
         template<typename unit_type>
-        inline void writeOne(const unit_type unit)
+        void writeOne(const unit_type unit)
         {
             writeSome<unit_type>(&unit, 1);
         }
 
         // Reading a one character from the file data.
-        inline void readChar(char& c) 
+        void readChar(char& c)
         {
             readOne<char>(c);
         }
 
         // Writing a one character into the file data.
-        inline void writeChar(const char c)
+        void writeChar(const char c)
         {
             writeOne<char>(c);
         }
 
         // Writing a string characters into the file data.
         template<typename string_char_t>
-        inline void writeString(const std::basic_string<string_char_t>& str)
+        void writeString(const std::basic_string<string_char_t>& str)
         {
             writeSome<string_char_t>(str.c_str(), str.size());
         }
@@ -114,14 +112,14 @@ namespace ffilesys
     private:
 
         // Generating a fopen flags string from bitflags.
-        void createStrFlags(unsigned char flags);
+        static void createStrFlags(unsigned char flags);
 
-        FILE* fileHandler = 0;
+        FILE* fileHandler = nullptr;
     };
 
     // Reading the whole file at once into the std::string output.
     // Do NOT use it for large files.
-    // Its createn for very tiny files that dont need a their own file handler.
+    // It's made for very tiny files that don't need their own file handler.
     void readFullFile(const std::string& filename, std::string& output);
 
     // Writing/rewriting a whole file at once from the std::string output. 

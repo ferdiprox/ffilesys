@@ -28,10 +28,14 @@ namespace ffilesys
 
         if(!fileHandler)
         {
-            throw errnoToErrorCode();
+            throw Exception(errnoToErrorCode(), filename + " (fopen() call failed)");
         }
     }
-    
+
+    void File::close() const {
+        fclose(fileHandler);
+    }
+
     void File::createStrFlags(unsigned char flags)
     {
         int writeOffset = 0;
@@ -50,7 +54,7 @@ namespace ffilesys
     {
         if(!std::filesystem::exists(filename))
         {
-            throw Exception(EC_NoSuchFileOrDir);
+            throw Exception(EC_NoSuchFileOrDir, filename);
         }
 
         size_t targetFileSize;
@@ -60,25 +64,25 @@ namespace ffilesys
             targetFileSize = std::filesystem::file_size(filename);
         } catch(...)
         {
-            throw Exception(EC_UnknownError);
+            throw Exception(EC_UnknownError, filename + " (std::filesystem::file_size() call failed)");
         }
 
         FILE* targetFileHandler = fopen(filename.c_str(), "rb");
 
         if(!targetFileHandler)
         {
-            throw Exception(errnoToErrorCode());
+            throw Exception(errnoToErrorCode(), filename + " (fopen() call failed)");
         }
 
         output.resize(targetFileSize);
 
-        const size_t readedSize = fread(output.data(), 1, targetFileSize, targetFileHandler);
+        const size_t readSize = fread(output.data(), 1, targetFileSize, targetFileHandler);
 
         fclose(targetFileHandler);
 
-        if(readedSize != targetFileSize)
+        if(readSize != targetFileSize)
         {
-            throw Exception(EC_UnknownError);
+            throw Exception(EC_UnknownError, filename + " (read and target file size are different)");
         }
     }
 
@@ -88,7 +92,7 @@ namespace ffilesys
 
         if(!targetFileHandler)
         {
-            throw Exception(errnoToErrorCode());
+            throw Exception(errnoToErrorCode(), filename + " (fopen() call failed)");
         }
 
         const size_t writenSize = fwrite(input.data(), 1, input.size(), targetFileHandler);
@@ -97,7 +101,7 @@ namespace ffilesys
 
         if(writenSize != input.size())
         {
-            throw Exception(EC_UnknownError);
+            throw Exception(EC_UnknownError, filename + " (written and target file size are different)");
         }
     }
 }
