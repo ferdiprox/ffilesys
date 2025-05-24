@@ -25,6 +25,12 @@ namespace ffilesys
         FOF_Binary = 1 << 3,
     };
 
+    enum FileOrigins {
+        FO_Begin = SEEK_SET,
+        FO_Current = SEEK_CUR,
+        FO_End = SEEK_END,
+    };
+
     static constexpr int NUM_FILE_OPEN_FLAGS = 4;
 
     // An Input/Output file manager, based on cstdio FILE.
