@@ -117,7 +117,7 @@ namespace ffilesys
 
         // Just a wrapper for fseek.
         void seek(const long offset, const int origin) const {
-            if (!fseek(fileHandler, offset, origin)) {
+            if (fseek(fileHandler, offset, origin)) {
                 throw Exception(errnoToErrorCode());
             }
         }
