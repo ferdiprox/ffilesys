@@ -109,6 +109,24 @@ namespace ffilesys
             writeSome<string_char_t>(str.c_str(), str.size());
         }
 
+        // Just a wrapper for fseek.
+        void seek(const long offset, const int origin) const {
+            if (!fseek(fileHandler, offset, origin)) {
+                throw Exception(errnoToErrorCode());
+            }
+        }
+
+        // Wrapper, same as seek().
+        [[nodiscard]] long tell() const {
+            const long result = ftell(fileHandler);
+
+            if (result == -1L) {
+                throw Exception(errnoToErrorCode());
+            }
+
+            return result;
+        }
+
     private:
 
         // Generating a fopen flags string from bitflags.
