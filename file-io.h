@@ -52,7 +52,7 @@ namespace ffilesys
         // Reading a some binary units from the file data.
         // Note that 'outputBuffer' must be pre-allocated with size of 'requiredUnitsNum'.
         template<typename unit_type>
-        void readSome(unit_type*& outputBuffer, const size_t& requiredUnitsNum)
+        void readSome(unit_type* outputBuffer, const size_t requiredUnitsNum)
         {
             FFS_FIO_NULLFH_HANDLER();
 
